@@ -34,17 +34,19 @@
             this.SourceBox = new System.Windows.Forms.TextBox();
             this.DestinationBox = new System.Windows.Forms.TextBox();
             this.Destination = new System.Windows.Forms.Button();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.savedGridView = new System.Windows.Forms.DataGridView();
             this.EPC = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.RugID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.numrows = new System.Windows.Forms.NumericUpDown();
             this.label1 = new System.Windows.Forms.Label();
-            this.savelist = new System.Windows.Forms.ComboBox();
             this.savetable = new System.Windows.Forms.Button();
-            this.savetextbox = new System.Windows.Forms.TextBox();
             this.opentables = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.scannerGridView = new System.Windows.Forms.DataGridView();
+            this.SEPC = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SRugID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            ((System.ComponentModel.ISupportInitialize)(this.savedGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numrows)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.scannerGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // Move
@@ -84,41 +86,43 @@
             // 
             // Destination
             // 
+            this.Destination.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.Destination.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.Destination.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Destination.Location = new System.Drawing.Point(616, 400);
+            this.Destination.Location = new System.Drawing.Point(1066, 600);
             this.Destination.Name = "Destination";
             this.Destination.Size = new System.Drawing.Size(106, 40);
             this.Destination.TabIndex = 17;
             this.Destination.Text = "Destination";
             this.Destination.UseVisualStyleBackColor = true;
             // 
-            // dataGridView1
+            // savedGridView
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.savedGridView.AllowUserToAddRows = false;
+            this.savedGridView.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.savedGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.savedGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.savedGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.EPC,
             this.RugID});
-            this.dataGridView1.Location = new System.Drawing.Point(12, 42);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 51;
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.Size = new System.Drawing.Size(808, 352);
-            this.dataGridView1.TabIndex = 18;
+            this.savedGridView.Location = new System.Drawing.Point(870, 242);
+            this.savedGridView.Name = "savedGridView";
+            this.savedGridView.RowHeadersWidth = 51;
+            this.savedGridView.RowTemplate.Height = 24;
+            this.savedGridView.Size = new System.Drawing.Size(400, 352);
+            this.savedGridView.TabIndex = 18;
             // 
             // EPC
             // 
             this.EPC.HeaderText = "EPC Number";
             this.EPC.MinimumWidth = 6;
             this.EPC.Name = "EPC";
-            this.EPC.Width = 125;
             // 
             // RugID
             // 
             this.RugID.HeaderText = "Rug ID";
             this.RugID.MinimumWidth = 6;
             this.RugID.Name = "RugID";
-            this.RugID.Width = 125;
             // 
             // numrows
             // 
@@ -148,16 +152,6 @@
             this.label1.TabIndex = 20;
             this.label1.Text = "Number of Rows";
             // 
-            // savelist
-            // 
-            this.savelist.FormattingEnabled = true;
-            this.savelist.Location = new System.Drawing.Point(420, 12);
-            this.savelist.MaxDropDownItems = 50;
-            this.savelist.Name = "savelist";
-            this.savelist.Size = new System.Drawing.Size(319, 24);
-            this.savelist.TabIndex = 21;
-            this.savelist.Text = "All saved tables here (currently not in use)";
-            // 
             // savetable
             // 
             this.savetable.Location = new System.Drawing.Point(12, 11);
@@ -167,15 +161,6 @@
             this.savetable.Text = "Save";
             this.savetable.UseVisualStyleBackColor = true;
             this.savetable.Click += new System.EventHandler(this.savetable_Click);
-            // 
-            // savetextbox
-            // 
-            this.savetextbox.Location = new System.Drawing.Point(93, 12);
-            this.savetextbox.MaxLength = 40;
-            this.savetextbox.Name = "savetextbox";
-            this.savetextbox.Size = new System.Drawing.Size(320, 22);
-            this.savetextbox.TabIndex = 24;
-            this.savetextbox.Text = "(currently not in use)";
             // 
             // opentables
             // 
@@ -187,30 +172,56 @@
             this.opentables.UseVisualStyleBackColor = true;
             this.opentables.Click += new System.EventHandler(this.opentables_Click);
             // 
+            // scannerGridView
+            // 
+            this.scannerGridView.AllowUserToAddRows = false;
+            this.scannerGridView.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.scannerGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.scannerGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.scannerGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.SEPC,
+            this.SRugID});
+            this.scannerGridView.Location = new System.Drawing.Point(462, 242);
+            this.scannerGridView.Name = "scannerGridView";
+            this.scannerGridView.RowHeadersWidth = 51;
+            this.scannerGridView.RowTemplate.Height = 24;
+            this.scannerGridView.Size = new System.Drawing.Size(401, 352);
+            this.scannerGridView.TabIndex = 26;
+            // 
+            // SEPC
+            // 
+            this.SEPC.HeaderText = "EPC";
+            this.SEPC.MinimumWidth = 6;
+            this.SEPC.Name = "SEPC";
+            // 
+            // SRugID
+            // 
+            this.SRugID.HeaderText = "Rug ID";
+            this.SRugID.MinimumWidth = 6;
+            this.SRugID.Name = "SRugID";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(832, 453);
+            this.ClientSize = new System.Drawing.Size(1732, 853);
+            this.Controls.Add(this.scannerGridView);
             this.Controls.Add(this.opentables);
-            this.Controls.Add(this.savetextbox);
             this.Controls.Add(this.savetable);
-            this.Controls.Add(this.savelist);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.numrows);
-            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.savedGridView);
             this.Controls.Add(this.Destination);
             this.Controls.Add(this.DestinationBox);
             this.Controls.Add(this.SourceBox);
             this.Controls.Add(this.Source);
             this.Controls.Add(this.Move);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "EPC2RugID";
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.savedGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numrows)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.scannerGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -222,15 +233,16 @@
         private System.Windows.Forms.TextBox SourceBox;
         private System.Windows.Forms.TextBox DestinationBox;
         private System.Windows.Forms.Button Destination;
-        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.DataGridView savedGridView;
         private System.Windows.Forms.DataGridViewTextBoxColumn EPC;
         private System.Windows.Forms.DataGridViewTextBoxColumn RugID;
         private System.Windows.Forms.NumericUpDown numrows;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox savelist;
         private System.Windows.Forms.Button savetable;
-        private System.Windows.Forms.TextBox savetextbox;
         private System.Windows.Forms.Button opentables;
+        private System.Windows.Forms.DataGridView scannerGridView;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SEPC;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SRugID;
     }
 }
 

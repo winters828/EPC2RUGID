@@ -3,6 +3,43 @@
  * 
  *  Goal/Overview
  *      
+ *      //Notes
+ *      fix the notes.
+ *      make the window static and get the layout right.
+ *      
+ *      The Main window 
+ *          You should have this primarly created already, you only need to expand the columns for more information
+ *      and include an export button for the final product.
+ *          Another large concept is rescanning. I'm thinking of having a second datagridview for the newly 
+ *          scanned file and another for the saved xml file that way they can be compared, you can even highlight
+ *          the missing scans.
+ *          
+ *          scan the bin bring it back, load the proper xml assignment file, select the file from the scanner,
+ *          If the EPC number has already been assigned 
+ *      
+ *      The Scanner side
+ *          The scanner side, with a press of the "Recent" button will by default take the latest file from 
+ *      the scanners inventory directory when connected.
+ *      If the default directory is not found then the user is prompted to use the "Load" button in order to 
+ *      select this specific file from the scanner.
+ *      If the directory of the file isn't from the familiar device, show a message box asking if the user wants
+ *      to continue understanding there may be unexpected errors.
+ *      
+ *      The Associated file 
+ *          The file given to me as an example should be loaded with a simple load button.
+ *      This will take the data from the file and fill out the four columns on the main window listed as
+ *      LocID, RugID, StockID and UPC. 
+ *      The better the load can handle an unorganized excel file the better
+ *      
+ *      The Save/Load XML file 
+ *          You should be able to save and load the data to and from an xml file. 
+ *      This raises the question of varying information from the associated file, likely just 
+ *      fill out blank areas as 'null' until changed by the user. 
+ *      
+ *      The output file 
+ *          This will be an export button that will automatically create a (csv or xslx?) file with 
+ *      
+ *      
  *      // Notes from richard
  *      step 1
  *      epc numbers should be read from the file and filled out in the rows.
@@ -109,15 +146,10 @@ namespace EPC2RUGID
 
             //Forced property changes
             //Starting number of rows
-            dataGridView1.RowCount = 3;
+            savedGridView.RowCount = 3;
             //Default width of columns
-            dataGridView1.Columns[0].Width = 280;
-            dataGridView1.Columns[1].Width = 280;
-            //savetextbox
-            this.savetextbox.AutoSize = false;
-            this.savetextbox.Height = 21;
 
-           
+
         }
 
      // Buttons
@@ -151,7 +183,7 @@ namespace EPC2RUGID
 
         private void numrows_ValueChanged(object sender, EventArgs e)
         {
-            dataGridView1.RowCount = (int) numrows.Value;
+            savedGridView.RowCount = (int) numrows.Value;
         }
 
         private void savetable_Click(object sender, EventArgs e)
@@ -161,13 +193,13 @@ namespace EPC2RUGID
             //Save the table to a dataset THEN use dataset to write to an xml
 
             //Adding the columns 
-            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            foreach (DataGridViewColumn column in savedGridView.Columns)
             {
                 if(dt.Columns != null) //explore what's null here and stop it. you may get it to work this way.
                     dt.Columns.Add(column.HeaderText);
             }
             //Adding the rows
-            foreach (DataGridViewRow row in dataGridView1.Rows)
+            foreach (DataGridViewRow row in savedGridView.Rows)
             {
                 dt.Rows.Add();
                 foreach(DataGridViewCell cell in row.Cells)
@@ -215,7 +247,7 @@ namespace EPC2RUGID
                 try
                 {
                     //Clear the Rows to make way for loaded file
-                    dataGridView1.Rows.Clear();
+                    savedGridView.Rows.Clear();
 
                     //Reading the XML file into the DataSet
                     XmlReader xmlFile = XmlReader.Create(ofd.FileName, new XmlReaderSettings());
@@ -223,7 +255,7 @@ namespace EPC2RUGID
 
                     foreach(DataRow row in ds.Tables[0].Rows)
                     {
-                        dataGridView1.Rows.Add(row["EPC Number"].ToString(), row["Rug ID"].ToString());
+                        savedGridView.Rows.Add(row["EPC Number"].ToString(), row["Rug ID"].ToString());
                     }
 
                     //don't forget to clear the dataset... datatable? before loading again
