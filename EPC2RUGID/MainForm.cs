@@ -1,86 +1,75 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Notes 
- * 
- *  Goal/Overview
+ * Notes    
+ *   //Section descriptions
+ *      The Creation table (left side)
  *      
- *      //Notes
- *      fix the notes.
- *      make the window static and get the layout right.
- *      
- *      The Main window 
- *          You should have this primarly created already, you only need to expand the columns for more information
- *      and include an export button for the final product.
- *          Another large concept is rescanning. I'm thinking of having a second datagridview for the newly 
- *          scanned file and another for the saved xml file that way they can be compared, you can even highlight
- *          the missing scans.
+ *          <Recent> button
+ *              If the default directory to the scanner is found, it should find the latest modified file 
+ *          (most recently created) and automatically load the EPC numbers into the rows of the grid
+ *          If the default directory is not found then the user is prompted to use the "Load" button 
+ *          in order to select this specific file from the scanner.
  *          
- *          scan the bin bring it back, load the proper xml assignment file, select the file from the scanner,
- *          If the EPC number has already been assigned 
+ *          <Import EPC> button 
+ *              The creation table Import EPC button should simply allow the user to select the .csv file 
+ *          themselves and load that information into the rows of the grid. 
+ *          If the file is organized in an unfamiliar way, warn the user. 
+ *          If the directory of the file isn't from the familiar device, show a message box asking 
+ *          if the user wants to continue understanding there may be unexpected errors.
  *      
- *      The Scanner side
- *          The scanner side, with a press of the "Recent" button will by default take the latest file from 
- *      the scanners inventory directory when connected.
- *      If the default directory is not found then the user is prompted to use the "Load" button in order to 
- *      select this specific file from the scanner.
- *      If the directory of the file isn't from the familiar device, show a message box asking if the user wants
- *      to continue understanding there may be unexpected errors.
+ *          <Import> button
+ *              The creation table Import button should take in an associated file and load this
+ *          information into the Creation table along side the EPC's 
+ *          (you can use the example file Richard sent you)
+ *          LocID, RugID, StockID and UPC
+ *          
+ *          <Match> button 
+ *              If there is a loaded .xml file on the Static data table, this button will match 
+ *          the newly scanned EPC numbers with the saved xml file's rug information based on matching
+ *          EPC numbers
+ *          Any EPC's that weren't matched should be highlighted on the right side to show
+ *          they are missing.
+ *          
+ *          <Save> button 
+ *              Saves the current constructed table from the creation table. This can later be loaded
+ *          on the Save table.
+ *          
+ *          <Clear> button 
+ *              Simply clears the Creation table 
+ *              
+ *              
+ *      The Save table (right side)
  *      
- *      The Associated file 
- *          The file given to me as an example should be loaded with a simple load button.
- *      This will take the data from the file and fill out the four columns on the main window listed as
- *      LocID, RugID, StockID and UPC. 
- *      The better the load can handle an unorganized excel file the better
- *      
- *      The Save/Load XML file 
- *          You should be able to save and load the data to and from an xml file. 
- *      This raises the question of varying information from the associated file, likely just 
- *      fill out blank areas as 'null' until changed by the user. 
- *      
- *      The output file 
- *          This will be an export button that will automatically create a (csv or xslx?) file with 
- *      
- *      
- *      // Notes from richard
- *      step 1
- *      epc numbers should be read from the file and filled out in the rows.
- *      we want the user to be able to select his own file OR auto select last modified 
- *      file in the default directory of the scanner.
- *      Ideally we want to scan the EPC tags and scan them into the rows of my program
- *      via a click of a button (or even better automatically). 
- *      
- *      step 2
- *      After, we want to load an excel file from the desktop containing
- *      locID, RugID, StockID and UPC and load it onto the program.
- *      
- *      step 3 (already practically done)
- *      we'll save all this information to an .xml file and upon the click of an export button.
- *      You can put out a new excel file that matches all the EPC numbers with the RugId and
- *      joining information. 
- *      
- *      //self notes
+ *          <Load> 
+ *              Loads a previously saved .xml file to the Save table on the right. 
+ *              
+ *          <Clear>
+ *              Simply clears the Save table
+ *              
+ *          <Export>
+ *              Depending on what he wants to export, this could export the Creation table or
+ *          the saved table (csv, xslx or both maybe?)
+ *          
+ *   //General notes and references
+ *   
  *      We'll have to talk about not changing the associated .xslx file around to much and 
  *      keeping it within a certain format for now. It would be really cool, to identify the header
  *      and scan it into the program but we'll take things step at a time.
  *      
- *      also get used to .csv files
+ *      - also get used to .csv files
+ *      - If you accidently created a reference through double clicking and you want to delete it, go to the object in designer
+ *        click on it >> properties >> events >> find it in events list, click and delete.
+ *      - In case you need the directory of the project
+ *          //string workingDirectory = Environment.CurrentDirectory;
+ *          //string projdir = Directory.GetParent(workingDirectory).Parent.FullName;
+ *          //C:\Users\Birb\source\repos\EPC2RUGID\EPC2RUGID
  *      
- *  To do list
+ *   //To do list
  *      
- *      - Organize your notes first <------
  *      https://stackoverflow.com/questions/3360324/check-last-modified-date-of-file-in-c-sharp
  *      - Then look into how to check every file in the folder for the lastest
  *      date so then you have an option to get the latest file automatically
  *      Then you can select the associated file to combine the two
- *      
- *      // saving/loading data/table into a drop box with user control
- *      
- *      - Now we need to load the datatable onto the datagridview
- *      
- *      // Allowing the user to create their own source and destination directories
- *      
- *      
- *      
- *      // verschiedenes aufgabe
+ *      - Perhaps allowing the user to change the source directory in case it's not accurate 
  *      - Get rid of noise upon pressing enter on the number of rows
  *      - Take all data from all the excel files and put them in a single one
  *      - Give the user the ability to update the source and destination folders on the form.
@@ -94,20 +83,10 @@
  *        
  *      - !!! make sure building the application is also possible!!!
  * 
- *  Longterm considerations
- *      - FormBorderStyle is set to single for now, if you can resize the objects with it you can add form resizing
- *      - If you have the exact same rug ID for different EPC's then you need to rename 
- *        repeating ID's with an extra number or something.
- *      
- *  Reference Notes
- *      - If you accidently created a reference through double clicking and you want to delete it, go to the object in designer
- *        click on it >> properties >> events >> find it in events list, click and delete.
- *      - In case you need the directory of the project
- *          //string workingDirectory = Environment.CurrentDirectory;
- *          //string projdir = Directory.GetParent(workingDirectory).Parent.FullName;
- *          //C:\Users\Birb\source\repos\EPC2RUGID\EPC2RUGID
- *        
- *  Done list
+ *   //Longterm considerations
+ *      - repeating rug information 
+ *            
+ *   //Done list (to show what's been worked on)
  *      - User is able to move any files from one directory to another
  *      - User is now able to control how many rows in the datagrid window
  *      - User is now able to check the extension of the file to make sure it's only .xlsx
@@ -144,6 +123,9 @@ namespace EPC2RUGID
         { //The overall form where you can manipulate property values 
             InitializeComponent();
 
+
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             //Forced property changes
             //Starting number of rows
             savedGridView.RowCount = 3;
