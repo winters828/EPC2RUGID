@@ -318,6 +318,7 @@ namespace EPC2RUGID
                 }
                 catch (Exception ex)
                 {
+                    MessageBox.Show("The file is likely open in another process, please close and try again", "Already Opened");
                     Console.WriteLine(ex);
                 }
             }
@@ -325,6 +326,7 @@ namespace EPC2RUGID
 
         private void importDataBtn_Click(object sender, EventArgs e)
         {
+            
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "CSV|*.csv";
             if (ofd.ShowDialog() == DialogResult.OK)
@@ -340,14 +342,14 @@ namespace EPC2RUGID
                         }
                     }
                     string[] rows = rawrow.ToArray();
-                    string[] table = new string[8]; //Must have 8 matching categories
+                    string[] shuffle = new string[8]; //Must have 8 matching categories
 
                     for (int i = 0; i < rows.Length; i++)
                     {
                         string[] data = rows[i].Split(',');
                         for (int j = 0; j < 8; j++) //We'll know that there's 8 categories
                         {
-                            table[j] += data[j] + ",";
+                            shuffle[j] += data[j] + ",";
 
                         }
                     }
@@ -357,44 +359,76 @@ namespace EPC2RUGID
                     //locid=1 loctype=2 RugId=3 size=4 upc=5 stockno=6 type=7 sysq=8
                     for(int i = 0; i < 8; i++)
                     {
-                        string[] header = table[i].Split(','); //[0] is the header
+                        string[] table = shuffle[i].Split(','); //[0] is the table
 
-                        if (header[0] == "Location ID:")
+                        //Adding rows in case there's more 
+                        if(table.Length != creationGridView.Rows.Count)
                         {
-                            for(int j = 0; j < creationGridView.RowCount; j++)
-                            {
-                                creationGridView.Rows[j].Cells[1].Value = header[j].ToString();
-                            }
-                                MessageBox.Show("Location ID");
-                        } else if (header[0] == "Location Type:")
-                        {
-                            for (int j = 0; j < creationGridView.RowCount; j++)
-                            {
-                                creationGridView.Rows[j].Cells[2].Value = header[j].ToString();
-                            }
-                                MessageBox.Show("Location Type");
-                        } else if (header[0] == "Rug ID")
-                        {
-                            for (int j = 0; j < creationGridView.RowCount; j++)
-                            {
-                                creationGridView.Rows[j].Cells[3].Value = header[j].ToString();
-                            }
-                            MessageBox.Show("Rug ID");
+                            int difference = table.Length - creationGridView.Rows.Count;
+                            MessageBox.Show("difference: " + Math.Abs(difference)); //should be how many rows to add
+                            for (int j = 0; j < difference; j++)
+                                creationGridView.Rows.Add();
                         }
-                    }
 
-                    //creationGridView.Columns[0].HeaderText;
-                    //creationGridView.Rows[i].Cells[1].Value = "no longer unedited";
+                        if (table[0] == "Location ID:")
+                        {
+                            for(int j = 0; j < table.Length; j++)
+                                creationGridView.Rows[j].Cells[1].Value = table[j].ToString();
+                        } else if (table[0] == "Location Type:")
+                        {
+                            for (int j = 0; j < table.Length; j++)
+                                creationGridView.Rows[j].Cells[2].Value = table[j].ToString();
+                        } else if (table[0] == "Rug ID")
+                        {
+                            for (int j = 0; j < table.Length; j++)
+                                creationGridView.Rows[j].Cells[3].Value = table[j].ToString();
+                        } else if (table[0] == "Size")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                                creationGridView.Rows[j].Cells[4].Value = table[j].ToString();
+                        } else if (table[0] == "UPC")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                                creationGridView.Rows[j].Cells[5].Value = table[j].ToString();
+                        } else if (table[0] == "Stock No")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                                creationGridView.Rows[j].Cells[6].Value = table[j].ToString();
+                        } else if (table[0] == "Type")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                                creationGridView.Rows[j].Cells[7].Value = table[j].ToString();
+                        } else if (table[0] == "System Qty")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                                creationGridView.Rows[j].Cells[8].Value = table[j].ToString();
+                        }
+                    }// End of for loop
+
+                    /*To do list
+                        - Figure out why the double qoutes duplicate
+                        - Get the headers out of the data
+                        - Be able to open either file first
+                        - Use lists to only fill out columns that are included in the file
+                        - EPC numbers create the row, I think if you figure 
+                        out opening either file, you'll get the answer to this.
+                        The file with more rows needs to create more in case there are none left.
+                        You just have to create rows if there are none which means you'll
+                        have to make that adjustment to the import EPC button 
+
+                        Find out how to see if there's more data in a file left over
+
 
                     //I'm also thinking you can create a list for each available column
                     //then you would be able to do the length of the list and move the 
-                    //information over. 
+                    //information over. */
 
 
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("The file is likely open in another process, please close and try again","Already Opened");
+                    MessageBox.Show("The file is likely open in another process, please close and try again\nPlease note," +
+                        " this could be another Exception","Already Opened");
                     Console.WriteLine(ex);
                 }
                 
