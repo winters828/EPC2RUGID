@@ -9,6 +9,9 @@
  *          If the default directory is not found then the user is prompted to use the "Load" button 
  *          in order to select this specific file from the scanner.
  *          
+ *          This PC\MC3300x\Internal shared storage\inventory
+ *          
+ *          
  *          <Import EPC> button 
  *              The creation table Import EPC button should simply allow the user to select the .csv file 
  *          themselves and load that information into the rows of the grid. 
@@ -16,8 +19,8 @@
  *          If the directory of the file isn't from the familiar device, show a message box asking 
  *          if the user wants to continue understanding there may be unexpected errors.
  *      
- *          <Import> button
- *              The creation table Import button should take in an associated file and load this
+ *          <Import Data> button
+ *              The creation table Import Data button should take in an associated file and load this
  *          information into the Creation table along side the EPC's 
  *          (you can use the example file Richard sent you)
  *          LocID, RugID, StockID and UPC
@@ -55,7 +58,8 @@
  *      keeping it within a certain format for now. It would be really cool, to identify the header
  *      and scan it into the program but we'll take things step at a time.
  *      
- *      - also get used to .csv files
+ *      - How to edit specific cells
+ *          creationGridView.Rows[i].Cells[1].Value = "no longer unedited";
  *      - If you accidently created a reference through double clicking and you want to delete it, go to the object in designer
  *        click on it >> properties >> events >> find it in events list, click and delete.
  *      - In case you need the directory of the project
@@ -72,19 +76,13 @@
  *      - Perhaps allowing the user to change the source directory in case it's not accurate 
  *      - Get rid of noise upon pressing enter on the number of rows
  *      - Take all data from all the excel files and put them in a single one
- *      - Give the user the ability to update the source and destination folders on the form.
- *        Default should always be the drive of the inventory folder in the drive of the scanner.
- *      - It should go "Pull"(or "Move") button, "source" button, "destination" button, "Exit" button along the bottom 
- *      - It should have an easy to interact with epc2rugid system, keep in mind this is handling the data of triple digit
- *        number of Id's 
- *        You may need to get more information on any kind of patterns of the EPC numbers we have, that will be helpful later.
- *        
- *      - Take all excel files from source folder and add to a single file to keep for records.
  *        
  *      - !!! make sure building the application is also possible!!!
  * 
  *   //Longterm considerations
  *      - repeating rug information 
+ *      - There need to be 8 headers on the imported data file, lists may fix this in the future
+ *      but for now stick with the arrays
  *            
  *   //Done list (to show what's been worked on)
  *      - User is able to move any files from one directory to another
@@ -106,6 +104,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Diagnostics;
+using System.Collections;
 
 namespace EPC2RUGID
 {
@@ -124,19 +124,11 @@ namespace EPC2RUGID
             InitializeComponent();
 
 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            //Forced property changes
-            //Starting number of rows
-            savedGridView.RowCount = 3;
-            //Default width of columns
-
-
         }
 
      // Buttons
         private void Move_Click(object sender, EventArgs e)
-        {// For now, this is my test button to see if we can move files
+        {// We may not even need this now, keep the button off to the side
 
             //MessageBox.Show(text: $"Hello your button currently works");
 
@@ -162,11 +154,6 @@ namespace EPC2RUGID
             }
 
         }// End of move_click
-
-        private void numrows_ValueChanged(object sender, EventArgs e)
-        {
-            savedGridView.RowCount = (int) numrows.Value;
-        }
 
         private void savetable_Click(object sender, EventArgs e)
         {
@@ -234,7 +221,7 @@ namespace EPC2RUGID
                     //Reading the XML file into the DataSet
                     XmlReader xmlFile = XmlReader.Create(ofd.FileName, new XmlReaderSettings());
                     ds.ReadXml(xmlFile);
-
+//We need to update the test files with a real saved xml file
                     foreach(DataRow row in ds.Tables[0].Rows)
                     {
                         savedGridView.Rows.Add(row["EPC Number"].ToString(), row["Rug ID"].ToString());
@@ -282,5 +269,136 @@ namespace EPC2RUGID
             return true;
         }
 
+        private void recentBtn_Click(object sender, EventArgs e)
+        {
+            //string[] files = Directory.GetFiles(@"This PC\MC3300x\Internal shared storage\inventory");
+            string[] files = Directory.GetLogicalDrives();
+            string all = "";
+            foreach (string file in files)
+            {
+                all += "\n" + file;
+            }
+
+            MessageBox.Show(all);
+        }
+
+        private void importEPCBtn_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "CSV|*.csv";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    //Clear the Rows to make way for loaded file, clear the dataset for re-use
+                    creationGridView.Rows.Clear();
+                    ds.Clear();
+                    ds.Reset();
+                    //To read the .csv file, we need to convert each row to a list
+                    List<String> cells = new List<String>();
+                    using(var reader = new StreamReader(ofd.FileName))
+                    {
+                        while (!reader.EndOfStream)
+                        {
+                            cells.Add(reader.ReadLine());
+                        }
+                    }
+                    //You can remove from a list but it was bugging out for some reason
+                    //Here we convert the list to an array for easy processing
+                    string[] rows = cells.ToArray();
+                    //We only want EPC numbers, nothing else added to the list
+                    for(int i = 0; i < rows.Length; i++)
+                    {
+                        if (rows[i] != "")
+                            if (rows[i][0] == 'E') // consider checking for the F at the end 
+                            {//for extra accuracy
+                                creationGridView.Rows.Add(rows[i].Split(',')[0] + "\n", "load here");
+                            }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+        }// End of import EPC button click
+
+        private void importDataBtn_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "CSV|*.csv";
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    List<String> rawrow = new List<String>();
+                    using (var reader = new StreamReader(ofd.FileName))
+                    {
+                        while (!reader.EndOfStream)
+                        {
+                            rawrow.Add(reader.ReadLine());
+                        }
+                    }
+                    string[] rows = rawrow.ToArray();
+                    string[] table = new string[8]; //Must have 8 matching categories
+
+                    for (int i = 0; i < rows.Length; i++)
+                    {
+                        string[] data = rows[i].Split(',');
+                        for (int j = 0; j < 8; j++) //We'll know that there's 8 categories
+                        {
+                            table[j] += data[j] + ",";
+
+                        }
+                    }
+                    // The data is organized and matched together to match with the proper column
+                    // and fill out the data
+
+                    //locid=1 loctype=2 RugId=3 size=4 upc=5 stockno=6 type=7 sysq=8
+                    for(int i = 0; i < 8; i++)
+                    {
+                        string[] header = table[i].Split(','); //[0] is the header
+
+                        if (header[0] == "Location ID:")
+                        {
+                            for(int j = 0; j < creationGridView.RowCount; j++)
+                            {
+                                creationGridView.Rows[j].Cells[1].Value = header[j].ToString();
+                            }
+                                MessageBox.Show("Location ID");
+                        } else if (header[0] == "Location Type:")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                            {
+                                creationGridView.Rows[j].Cells[2].Value = header[j].ToString();
+                            }
+                                MessageBox.Show("Location Type");
+                        } else if (header[0] == "Rug ID")
+                        {
+                            for (int j = 0; j < creationGridView.RowCount; j++)
+                            {
+                                creationGridView.Rows[j].Cells[3].Value = header[j].ToString();
+                            }
+                            MessageBox.Show("Rug ID");
+                        }
+                    }
+
+                    //creationGridView.Columns[0].HeaderText;
+                    //creationGridView.Rows[i].Cells[1].Value = "no longer unedited";
+
+                    //I'm also thinking you can create a list for each available column
+                    //then you would be able to do the length of the list and move the 
+                    //information over. 
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("The file is likely open in another process, please close and try again","Already Opened");
+                    Console.WriteLine(ex);
+                }
+                
+            }
+        }
     }// End of Class
 }// End of namespace
