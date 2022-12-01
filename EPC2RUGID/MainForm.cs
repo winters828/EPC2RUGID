@@ -406,7 +406,7 @@ namespace EPC2RUGID
                         creationGridView.Rows[rowi + i].Cells[3].Value = creationGridView.Rows[rowi].Cells[3].Value;
                     }
                 }
-            }//You crazy son of a bitch you did it. do it with all columns now clean up, then move to the to do list
+            }//You crazy sob you did it. do it with all columns now clean up, then move to the to do list
 
             //To do after
             //load the duplicate data to the empty cells
