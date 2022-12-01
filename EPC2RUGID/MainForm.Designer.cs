@@ -34,13 +34,8 @@
             this.SourceBox = new System.Windows.Forms.TextBox();
             this.savedGridView = new System.Windows.Forms.DataGridView();
             this.savetable = new System.Windows.Forms.Button();
-            this.opentables = new System.Windows.Forms.Button();
+            this.loadTables = new System.Windows.Forms.Button();
             this.creationGridView = new System.Windows.Forms.DataGridView();
-            this.TheWindowsFixer = new System.Windows.Forms.Panel();
-            this.recentBtn = new System.Windows.Forms.Button();
-            this.importEPCBtn = new System.Windows.Forms.Button();
-            this.importDataBtn = new System.Windows.Forms.Button();
-            this.matchBtn = new System.Windows.Forms.Button();
             this.SEPC = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LocationID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LocationType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -50,6 +45,12 @@
             this.StockNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SystemQty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TheWindowsFixer = new System.Windows.Forms.Panel();
+            this.recentBtn = new System.Windows.Forms.Button();
+            this.importEPCBtn = new System.Windows.Forms.Button();
+            this.importDataBtn = new System.Windows.Forms.Button();
+            this.matchBtn = new System.Windows.Forms.Button();
+            this.clearBtn = new System.Windows.Forms.Button();
             this.EPC = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SLocationID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SLocationType = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -78,16 +79,16 @@
             // SourceBtn
             // 
             this.SourceBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SourceBtn.Location = new System.Drawing.Point(662, 803);
+            this.SourceBtn.Location = new System.Drawing.Point(1338, 806);
             this.SourceBtn.Name = "SourceBtn";
-            this.SourceBtn.Size = new System.Drawing.Size(100, 40);
+            this.SourceBtn.Size = new System.Drawing.Size(97, 33);
             this.SourceBtn.TabIndex = 14;
             this.SourceBtn.Text = "Source";
             this.SourceBtn.UseVisualStyleBackColor = true;
             // 
             // SourceBox
             // 
-            this.SourceBox.Location = new System.Drawing.Point(768, 814);
+            this.SourceBox.Location = new System.Drawing.Point(1142, 812);
             this.SourceBox.Name = "SourceBox";
             this.SourceBox.Size = new System.Drawing.Size(190, 22);
             this.SourceBox.TabIndex = 15;
@@ -96,7 +97,7 @@
             // 
             this.savedGridView.AllowUserToAddRows = false;
             this.savedGridView.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.savedGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.savedGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.savedGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.savedGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.EPC,
@@ -117,7 +118,7 @@
             // 
             // savetable
             // 
-            this.savetable.Location = new System.Drawing.Point(473, 810);
+            this.savetable.Location = new System.Drawing.Point(473, 806);
             this.savetable.Name = "savetable";
             this.savetable.Size = new System.Drawing.Size(101, 33);
             this.savetable.TabIndex = 22;
@@ -125,21 +126,21 @@
             this.savetable.UseVisualStyleBackColor = true;
             this.savetable.Click += new System.EventHandler(this.savetable_Click);
             // 
-            // opentables
+            // loadTables
             // 
-            this.opentables.Location = new System.Drawing.Point(1108, 808);
-            this.opentables.Name = "opentables";
-            this.opentables.Size = new System.Drawing.Size(75, 28);
-            this.opentables.TabIndex = 25;
-            this.opentables.Text = "Load";
-            this.opentables.UseVisualStyleBackColor = true;
-            this.opentables.Click += new System.EventHandler(this.opentables_Click);
+            this.loadTables.Location = new System.Drawing.Point(780, 808);
+            this.loadTables.Name = "loadTables";
+            this.loadTables.Size = new System.Drawing.Size(75, 28);
+            this.loadTables.TabIndex = 25;
+            this.loadTables.Text = "Load";
+            this.loadTables.UseVisualStyleBackColor = true;
+            this.loadTables.Click += new System.EventHandler(this.loadTable_Click);
             // 
             // creationGridView
             // 
             this.creationGridView.AllowUserToAddRows = false;
             this.creationGridView.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.creationGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.creationGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.creationGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.creationGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.SEPC,
@@ -157,6 +158,78 @@
             this.creationGridView.RowTemplate.Height = 24;
             this.creationGridView.Size = new System.Drawing.Size(750, 771);
             this.creationGridView.TabIndex = 26;
+            // 
+            // SEPC
+            // 
+            this.SEPC.HeaderText = "EPC";
+            this.SEPC.MinimumWidth = 6;
+            this.SEPC.Name = "SEPC";
+            this.SEPC.ReadOnly = true;
+            this.SEPC.Width = 63;
+            // 
+            // LocationID
+            // 
+            this.LocationID.HeaderText = "Location ID:";
+            this.LocationID.MinimumWidth = 6;
+            this.LocationID.Name = "LocationID";
+            this.LocationID.ReadOnly = true;
+            this.LocationID.Width = 98;
+            // 
+            // LocationType
+            // 
+            this.LocationType.HeaderText = "Location Type:";
+            this.LocationType.MinimumWidth = 6;
+            this.LocationType.Name = "LocationType";
+            this.LocationType.ReadOnly = true;
+            this.LocationType.Width = 115;
+            // 
+            // SRugID
+            // 
+            this.SRugID.HeaderText = "Rug ID";
+            this.SRugID.MinimumWidth = 6;
+            this.SRugID.Name = "SRugID";
+            this.SRugID.ReadOnly = true;
+            this.SRugID.Width = 72;
+            // 
+            // Size
+            // 
+            this.Size.HeaderText = "Size";
+            this.Size.MinimumWidth = 6;
+            this.Size.Name = "Size";
+            this.Size.ReadOnly = true;
+            this.Size.Width = 62;
+            // 
+            // UPC
+            // 
+            this.UPC.HeaderText = "UPC";
+            this.UPC.MinimumWidth = 6;
+            this.UPC.Name = "UPC";
+            this.UPC.ReadOnly = true;
+            this.UPC.Width = 64;
+            // 
+            // StockNo
+            // 
+            this.StockNo.HeaderText = "Stock No";
+            this.StockNo.MinimumWidth = 6;
+            this.StockNo.Name = "StockNo";
+            this.StockNo.ReadOnly = true;
+            this.StockNo.Width = 84;
+            // 
+            // Type
+            // 
+            this.Type.HeaderText = "Type";
+            this.Type.MinimumWidth = 6;
+            this.Type.Name = "Type";
+            this.Type.ReadOnly = true;
+            this.Type.Width = 68;
+            // 
+            // SystemQty
+            // 
+            this.SystemQty.HeaderText = "System Qty";
+            this.SystemQty.MinimumWidth = 6;
+            this.SystemQty.Name = "SystemQty";
+            this.SystemQty.ReadOnly = true;
+            this.SystemQty.Width = 96;
             // 
             // TheWindowsFixer
             // 
@@ -179,7 +252,7 @@
             // 
             // importEPCBtn
             // 
-            this.importEPCBtn.Location = new System.Drawing.Point(115, 808);
+            this.importEPCBtn.Location = new System.Drawing.Point(115, 806);
             this.importEPCBtn.Name = "importEPCBtn";
             this.importEPCBtn.Size = new System.Drawing.Size(116, 33);
             this.importEPCBtn.TabIndex = 30;
@@ -189,7 +262,7 @@
             // 
             // importDataBtn
             // 
-            this.importDataBtn.Location = new System.Drawing.Point(237, 808);
+            this.importDataBtn.Location = new System.Drawing.Point(237, 806);
             this.importDataBtn.Name = "importDataBtn";
             this.importDataBtn.Size = new System.Drawing.Size(119, 33);
             this.importDataBtn.TabIndex = 31;
@@ -199,82 +272,30 @@
             // 
             // matchBtn
             // 
-            this.matchBtn.Location = new System.Drawing.Point(362, 808);
+            this.matchBtn.Location = new System.Drawing.Point(362, 806);
             this.matchBtn.Name = "matchBtn";
             this.matchBtn.Size = new System.Drawing.Size(105, 33);
             this.matchBtn.TabIndex = 32;
             this.matchBtn.Text = "Match";
             this.matchBtn.UseVisualStyleBackColor = true;
             // 
-            // SEPC
+            // clearBtn
             // 
-            this.SEPC.HeaderText = "EPC";
-            this.SEPC.MinimumWidth = 6;
-            this.SEPC.Name = "SEPC";
-            this.SEPC.ReadOnly = true;
-            // 
-            // LocationID
-            // 
-            this.LocationID.HeaderText = "Location ID:";
-            this.LocationID.MinimumWidth = 6;
-            this.LocationID.Name = "LocationID";
-            this.LocationID.ReadOnly = true;
-            // 
-            // LocationType
-            // 
-            this.LocationType.HeaderText = "Location Type:";
-            this.LocationType.MinimumWidth = 6;
-            this.LocationType.Name = "LocationType";
-            this.LocationType.ReadOnly = true;
-            // 
-            // SRugID
-            // 
-            this.SRugID.HeaderText = "Rug ID";
-            this.SRugID.MinimumWidth = 6;
-            this.SRugID.Name = "SRugID";
-            this.SRugID.ReadOnly = true;
-            // 
-            // Size
-            // 
-            this.Size.HeaderText = "Size";
-            this.Size.MinimumWidth = 6;
-            this.Size.Name = "Size";
-            this.Size.ReadOnly = true;
-            // 
-            // UPC
-            // 
-            this.UPC.HeaderText = "UPC";
-            this.UPC.MinimumWidth = 6;
-            this.UPC.Name = "UPC";
-            this.UPC.ReadOnly = true;
-            // 
-            // StockNo
-            // 
-            this.StockNo.HeaderText = "Stock No";
-            this.StockNo.MinimumWidth = 6;
-            this.StockNo.Name = "StockNo";
-            this.StockNo.ReadOnly = true;
-            // 
-            // Type
-            // 
-            this.Type.HeaderText = "Type";
-            this.Type.MinimumWidth = 6;
-            this.Type.Name = "Type";
-            this.Type.ReadOnly = true;
-            // 
-            // SystemQty
-            // 
-            this.SystemQty.HeaderText = "System Qty";
-            this.SystemQty.MinimumWidth = 6;
-            this.SystemQty.Name = "SystemQty";
-            this.SystemQty.ReadOnly = true;
+            this.clearBtn.Location = new System.Drawing.Point(580, 806);
+            this.clearBtn.Name = "clearBtn";
+            this.clearBtn.Size = new System.Drawing.Size(106, 33);
+            this.clearBtn.TabIndex = 33;
+            this.clearBtn.Text = "Clear";
+            this.clearBtn.UseVisualStyleBackColor = true;
+            this.clearBtn.Click += new System.EventHandler(this.clearBtn_Click);
             // 
             // EPC
             // 
-            this.EPC.HeaderText = "EPC Number";
+            this.EPC.HeaderText = "EPC";
             this.EPC.MinimumWidth = 6;
             this.EPC.Name = "EPC";
             this.EPC.ReadOnly = true;
+            this.EPC.Width = 63;
             // 
             // SLocationID
             // 
@@ -282,6 +303,7 @@
             this.SLocationID.MinimumWidth = 6;
             this.SLocationID.Name = "SLocationID";
             this.SLocationID.ReadOnly = true;
+            this.SLocationID.Width = 98;
             // 
             // SLocationType
             // 
@@ -289,6 +311,7 @@
             this.SLocationType.MinimumWidth = 6;
             this.SLocationType.Name = "SLocationType";
             this.SLocationType.ReadOnly = true;
+            this.SLocationType.Width = 115;
             // 
             // RugID
             // 
@@ -296,6 +319,7 @@
             this.RugID.MinimumWidth = 6;
             this.RugID.Name = "RugID";
             this.RugID.ReadOnly = true;
+            this.RugID.Width = 72;
             // 
             // SSize
             // 
@@ -303,6 +327,7 @@
             this.SSize.MinimumWidth = 6;
             this.SSize.Name = "SSize";
             this.SSize.ReadOnly = true;
+            this.SSize.Width = 62;
             // 
             // SUPC
             // 
@@ -310,6 +335,7 @@
             this.SUPC.MinimumWidth = 6;
             this.SUPC.Name = "SUPC";
             this.SUPC.ReadOnly = true;
+            this.SUPC.Width = 64;
             // 
             // SStockNo
             // 
@@ -317,6 +343,7 @@
             this.SStockNo.MinimumWidth = 6;
             this.SStockNo.Name = "SStockNo";
             this.SStockNo.ReadOnly = true;
+            this.SStockNo.Width = 84;
             // 
             // SType
             // 
@@ -324,6 +351,7 @@
             this.SType.MinimumWidth = 6;
             this.SType.Name = "SType";
             this.SType.ReadOnly = true;
+            this.SType.Width = 68;
             // 
             // SSystemQty
             // 
@@ -331,6 +359,7 @@
             this.SSystemQty.MinimumWidth = 6;
             this.SSystemQty.Name = "SSystemQty";
             this.SSystemQty.ReadOnly = true;
+            this.SSystemQty.Width = 96;
             // 
             // MainForm
             // 
@@ -338,19 +367,21 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1782, 853);
+            this.Controls.Add(this.clearBtn);
             this.Controls.Add(this.matchBtn);
             this.Controls.Add(this.importDataBtn);
             this.Controls.Add(this.importEPCBtn);
             this.Controls.Add(this.recentBtn);
             this.Controls.Add(this.TheWindowsFixer);
             this.Controls.Add(this.creationGridView);
-            this.Controls.Add(this.opentables);
+            this.Controls.Add(this.loadTables);
             this.Controls.Add(this.savetable);
             this.Controls.Add(this.savedGridView);
             this.Controls.Add(this.SourceBox);
             this.Controls.Add(this.SourceBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "EPC2RugID";
             ((System.ComponentModel.ISupportInitialize)(this.savedGridView)).EndInit();
@@ -367,22 +398,13 @@
         private System.Windows.Forms.TextBox SourceBox;
         private System.Windows.Forms.DataGridView savedGridView;
         private System.Windows.Forms.Button savetable;
-        private System.Windows.Forms.Button opentables;
+        private System.Windows.Forms.Button loadTables;
         private System.Windows.Forms.DataGridView creationGridView;
         private System.Windows.Forms.Panel TheWindowsFixer;
         private System.Windows.Forms.Button recentBtn;
         private System.Windows.Forms.Button importEPCBtn;
         private System.Windows.Forms.Button importDataBtn;
         private System.Windows.Forms.Button matchBtn;
-        private System.Windows.Forms.DataGridViewTextBoxColumn EPC;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SLocationID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SLocationType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn RugID;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SSize;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SUPC;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SStockNo;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SSystemQty;
         private System.Windows.Forms.DataGridViewTextBoxColumn SEPC;
         private System.Windows.Forms.DataGridViewTextBoxColumn LocationID;
         private System.Windows.Forms.DataGridViewTextBoxColumn LocationType;
@@ -392,6 +414,16 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn StockNo;
         private System.Windows.Forms.DataGridViewTextBoxColumn Type;
         private System.Windows.Forms.DataGridViewTextBoxColumn SystemQty;
+        private System.Windows.Forms.Button clearBtn;
+        private System.Windows.Forms.DataGridViewTextBoxColumn EPC;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SLocationID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SLocationType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn RugID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SSize;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SUPC;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SStockNo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SSystemQty;
     }
 }
 
