@@ -547,11 +547,60 @@ namespace EPC2RUGID
                 
             }// End of loading file
 
-            row_duplication();
-            highlight_unmatched();
-            clearEmptyRows();
-            
-        }// End of function
+//testing area
+            //Handling quantites > 1. windows forms is an embarassment and I need to recreate duplicating rows
+            List<int> rowindexcount = new List<int>();
+            List<int> rowindex = new List<int>();
+            //first we need to know what rows need to be duplicated and how many times sysq = 8
+            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
+            {
+                if (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1)
+                {
+                    rowindex.Add(rowi); // we have what index
+                    rowindexcount.Add(Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()));
+                    // we have how many times
+                }
+            }
+            //Now that we know which row and how many times, create the empty rows
+            for (int rowi = rowindex.Count-1; rowi >= 0; rowi--)
+            {
+                Debug.WriteLine("rowindex: " + rowindex[rowi] + "  rowindexcount: " + rowindexcount[rowi]);
+                creationGridView.Rows.Insert(rowindex[rowi]+1, rowindexcount[rowi]-1);
+            }
+            //Now we need to load the row from before into the new rows below
+            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
+            {
+                if (!String.IsNullOrEmpty(creationGridView.Rows[rowi].Cells[8].Value as String) 
+                    && (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1))
+                {
+                    for(int i = 1; i < Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()); i++)
+                    {
+                        creationGridView.Rows[rowi + i].Cells[3].Value = creationGridView.Rows[rowi].Cells[3].Value;
+                    }
+                }
+            }//You crazy sob you did it. do it with all columns now clean up, then move to the to do list
+
+            //To do after
+            //load the duplicate data to the empty cells
+            //change the number in the qty column to 1 (they should all be one)
+            //reload the EPC numbers for when they're loaded first 
+
+//testing area
+
+            //Highlight the unmatched rows.
+            if (creationGridView.Rows.Count != 0)
+                for (int j = 0; j < creationGridView.Rows.Count; j++)
+                    if ((String.IsNullOrEmpty(creationGridView.Rows[j].Cells[0].Value as String))
+                    || (String.IsNullOrEmpty(creationGridView.Rows[j].Cells[3].Value as String)))
+                    {
+                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.Red;
+                    }
+                    else
+                    {
+                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.White;
+                    }
+
+        }// End of function 
 
         //Needs to be redone to fit new table, maybe make more maliable as well.
         private void loadTable_Click(object sender, EventArgs e)
