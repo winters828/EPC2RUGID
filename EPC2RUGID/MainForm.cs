@@ -67,36 +67,34 @@
  *   //To do list
  *      
  *      Priority
- *      - If the quantity of rugs is more than 1 create as many rows for 
- *      the same rug so that they're matched with their own EPC number
- *      - Create the match button so that when a save table is loaded and
- *      the button is clicked, it will match the EPC's on the creation table
- *      with the data on the Saved table 
- *      - Change the save button to save the file from the creation table then
- *      load it to the saved table
- *      - Get rid of noise upon pressing enter on the number of rows
- *      - Take all data from all the excel files and put them in a single one
- *      - autofill the matching EPC tags with the information from the save table
- *      - highlight the missing EPC's on the creation table from the save table
- *      - if you load a new file while there's data on the table, you need to clear
- *      the COLUMN not the whole table and replace the data
- *      - In the comparison, differentiate a single rug missing and all of them
+ *      - !!! make sure building the application is also possible!!!
+ *      - create the step by step (documentation)
+ *      - Finish low priority work 
  *      
- *      Less important
+ *      
+ *      Low priority 
+ *      <Recent button>
  *      https://stackoverflow.com/questions/3360324/check-last-modified-date-of-file-in-c-sharp
  *      - Recent button, look into how to check every file in the folder for the lastest
  *      date so then you have an option to get the latest file automatically
  *      Then you can select the associated file to combine the two
- *      - Perhaps allowing the user to change the source directory in case it's not accurate 
+ *      - Perhaps allowing the user to change the source directory for the recent button in case it's not accurate 
+ *      <File structure>
+ *      - Creating a file structure automatically with EPC files, Data files, XML table files, output files 
+ *      - also maybe allowing the user to set the source directory for this file structure.
  *        
- *      - !!! make sure building the application is also possible!!!
  * 
  *   //Longterm considerations
- *      - repeating rug information 
- *      - There no longer needs to be 8 categories, however, you do need an organized
- *      csv file without empty rows or columns 
+ *      
  *            
  *   //Done list (to show what's been worked on)
+ *      - You can now export your data into a CSV onto the desktop
+ *      - Match button is finished with the ability to match the information over to the creation table and highlight which 
+ *      Epc numbers are missing in the creation table, represented on the saved table 
+ *      - We now replace all the data on a newly loaded file
+ *      - Empty rows are now cleared out no matter what data replaces it
+ *      - We now check both loaded files to make sure they meet specific requirements for each
+ *      - The creation table now duplicates rows while keeping the EPC's organized (that was a nightmare)
  *      - The creation table now highlights rows red when the rug id or epc column is null 
  *      - User can now load two seperate specific files either time and load the data
  *      - User is able to move any files from one directory to another
@@ -109,36 +107,199 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Linq;
+using System.Management;
 using System.Diagnostics;
 using System.Collections;
+
+//If not used by the end, delete
+//using System.Text;
+//using System.Threading.Tasks;
+//using System.ComponentModel;
 
 namespace EPC2RUGID
 {
     public partial class MainForm : Form
     {
-        //Directories
+        /*Directories also delete by finishing the program
         String sourcedir = @"C:\Users\Birb\Desktop\sourcetest";
-        String destinationdir = @"C:\Users\Birb\Desktop\destinationtest";
+        String destinationdir = @"C:\Users\Birb\Desktop\destinationtest";*/
 
         //Dataset and corresponding Datatable 
         DataTable dt = new DataTable();
         DataSet ds = new DataSet();
 
+        //Global variables
+        bool qtycolcheck = false;
+
         public MainForm()
-        { //The overall form where you can manipulate property values 
+        { //Start upon creation of the form, all prior actions are done here
             InitializeComponent();
+
+            // So upon running the program you want to create the directory tree on the desktop if there isn't one already 
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
+            ManagementObjectCollection collection = searcher.Get();
+            string usernamedir = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
+            string[] usernameAt1 = usernamedir.Split('\\');
+            //C:\Users\Birb\Desktop
+            string folderPath = "C:\\Users\\" + usernameAt1[1] + "\\Desktop\\CSVs\\";
+            MessageBox.Show(folderPath);
+            if (!Directory.Exists(folderPath))
+            {
+                Directory.CreateDirectory(folderPath);
+            }
         }
 
         // Local Functions
+
+        private void epcClear() // Clears EPC numbers column for the creation table
+        {
+            if (creationGridView.RowCount != 0)
+                for (int i = 0; i < creationGridView.RowCount; i++)
+                    creationGridView.Rows[i].Cells[0].Value = "";
+        }
+
+        private void dataClear() // Clears data side information for the creation table
+        {
+            if (creationGridView.RowCount != 0)
+                for (int i = 0; i < creationGridView.RowCount; i++)
+                    for (int j = 1; j <= 8; j++)
+                        creationGridView.Rows[i].Cells[j].Value = "";
+            highlight_unmatched();
+        }
+
+        private void clearEmptyRows()
+        {
+            //Get all the indexes first, then remove at all of the indexes
+            List<int> indexes = new List<int>();
+            bool contains = false;
+            if (creationGridView.RowCount != 0)
+            {
+                for (int i = 0; i < creationGridView.RowCount; i++)
+                {
+                    for (int k = 0; k <= 8; k++)
+                    {
+                        if (!String.IsNullOrEmpty(creationGridView.Rows[i].Cells[k].Value as String))
+                            if (creationGridView.Rows[i].Cells[k].Value.ToString() != "")
+                                contains = true;
+
+                    }
+                    if (!contains)
+                    {
+                        indexes.Add(i);
+                    }
+                    contains = false;
+                } //You need to remove from bottom up or else you'll change the indexes of the rows as you go down
+                for (int i = indexes.Count - 1; i >= 0; i--)
+                    creationGridView.Rows.RemoveAt(indexes[i]);
+            }
+
+        }
+
+        //Not a button
+        private void highlight_unmatched()
+        {
+            //Highlight the unmatched rows.
+            if (creationGridView.Rows.Count != 0)
+                for (int j = 0; j < creationGridView.Rows.Count; j++)
+                {   //All quantities should be one if the above code was successful 
+
+                    //if this row and cell[8] is not null then you can add 1
+                    if (!String.IsNullOrEmpty(creationGridView.Rows[j].Cells[8].Value as String))
+                        creationGridView.Rows[j].Cells[8].Value = "1";
+
+                    if ((String.IsNullOrEmpty(creationGridView.Rows[j].Cells[0].Value as String))
+                    || (String.IsNullOrEmpty(creationGridView.Rows[j].Cells[3].Value as String)))
+                    {
+                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.Red;
+                    }
+                    else
+                    {
+                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.White;
+                    }
+
+                    if (creationGridView.Rows[j].DefaultCellStyle.BackColor == Color.White || !String.IsNullOrEmpty(creationGridView.Rows[j].Cells[3].Value as String))
+                        creationGridView.Rows[j].Cells[8].Value = "1";
+                }
+            
+        }
+
+        //Duplicates rows if true that we have a quantity column 
+        //Also reloads the EPC numbers so that there aren't blanks
+        private void row_duplication()
+        {
+            //If there is no quantity column, why would we duplicate rows
+            if (!qtycolcheck)
+                return;
+
+            String epcs = "";
+            String[] epcsplit;
+            //Saving the EPC list in order to close the gaps
+            if (!String.IsNullOrEmpty(creationGridView.Rows[0].Cells[0].Value as String))
+                for (int i = 0; i < creationGridView.Rows.Count; i++) //You're loading EPC's first in this case, so you should be fine
+                {
+                    epcs += creationGridView.Rows[i].Cells[0].Value + ",";
+                    creationGridView.Rows[i].Cells[0].Value = "";
+                }
+
+            //Quantity Duplication (it'd look better if you put this in its own function then called it)
+            //Handling quantites > 1. windows forms is an embarassment and I need to recreate duplicating rows
+            List<int> rowindexcount = new List<int>();
+            List<int> rowindex = new List<int>();
+
+            //first we need to know what rows need to be duplicated and how many times sysq = 8
+            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
+            {
+                //Debug.WriteLine(rowi + ": " + creationGridView.Rows[rowi].Cells[8].Value.ToString());
+                if(!String.IsNullOrEmpty(creationGridView.Rows[rowi].Cells[8].Value as String))
+                    if (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1)
+                    {
+                        rowindex.Add(rowi); // we have what index
+                        rowindexcount.Add(Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()));
+                        // we have how many times
+                    }
+            }
+
+            //Now that we know which row and how many times, create the empty rows
+            for (int rowi = rowindex.Count - 1; rowi >= 0; rowi--)
+                creationGridView.Rows.Insert(rowindex[rowi] + 1, rowindexcount[rowi] - 1);
+
+            //Going through every row, we check if the row is null or if Qty is higher than 1 after that
+            //we go through as many extra new rows as neccessary for each row with a qty above 1, then we fill 
+            //the rows with the duplicate data
+            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
+                if (!String.IsNullOrEmpty(creationGridView.Rows[rowi].Cells[8].Value as String)
+                    && (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1))
+                    for (int i = 1; i < Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()); i++)
+                        for (int j = 1; j < 8; j++)
+                            creationGridView.Rows[rowi + i].Cells[j].Value = creationGridView.Rows[rowi].Cells[j].Value;
+
+            //Reloading the EPC list so there aren't gaps where inserts were created
+            epcsplit = epcs.Split(',');
+            for (int i = 0; i < epcsplit.Length - 1; i++)
+                creationGridView.Rows[i].Cells[0].Value = epcsplit[i];
+
+            //reseting the global variable 
+            qtycolcheck = false;
+        }
+
+        private void clearSavedTableHighlights()
+        {
+            if (savedGridView.Rows.Count != 0)
+                for (int i = 0; i < savedGridView.Rows.Count; i++)
+                    savedGridView.Rows[i].DefaultCellStyle.BackColor = Color.White;
+        }
+
+        // Buttons
+
+        /*likely will delete this event handler if not used. keep around for now as a note on moving files
+         * 
+        private void Move_Click(object sender, EventArgs e)
         //Takes in a List of strings (file directories) and checks the extension of the file.
         //Returns true if all files are .xlsx, returns false and shows message box warning the user of mixed files. 
         //This false value will be used to NOT move the files from the source folder. 
@@ -165,9 +326,6 @@ namespace EPC2RUGID
             MessageBox.Show("File successfully moved", "Success!");
             return true;
         }
-
-        // Buttons
-        private void Move_Click(object sender, EventArgs e)
         {// We may not even need this now, keep the button off to the side
 
             //MessageBox.Show(text: $"Hello your button currently works");
@@ -193,7 +351,7 @@ namespace EPC2RUGID
                 }
             }
 
-        }// End of move_click
+        }// End of move_click*/
 
         private void recentBtn_Click(object sender, EventArgs e)
         {
@@ -204,22 +362,25 @@ namespace EPC2RUGID
             {
                 all += "\n" + file;
             }
-
             MessageBox.Show(all);
         }
 
         private void importEPCBtn_Click(object sender, EventArgs e)
         {
+            
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "CSV|*.csv";
             ofd.Title = "Import EPC file";
             if (ofd.ShowDialog() == DialogResult.OK)
             {
+                //If there's a saved table and the user changes the EPC's we want to reset the saved table highlights
+                clearSavedTableHighlights();
+                    
                 try
                 {
                     //Clear the Rows to make way for loaded file, clear the dataset for re-use
                     //creationGridView.Rows.Clear();
-
+                    epcClear();
                     ds.Clear();
                     ds.Reset();
                     //To read the .csv file, we need to convert each row to a list
@@ -239,6 +400,13 @@ namespace EPC2RUGID
                             if (cell[0] == 'E')
                                 processedcells.Add(cell);
                     string[] rows = processedcells.ToArray();
+
+                    //If you have zero rows, ask the important question and then stop
+                    if(processedcells.Count == 0)
+                    {
+                        MessageBox.Show("Did you load an empty or inappropriately formated file?", "Incompatible file");
+                        return;
+                    }
 
                     if(rows.Length != creationGridView.Rows.Count && rows.Length > creationGridView.RowCount)
                     {
@@ -261,23 +429,13 @@ namespace EPC2RUGID
             }
 
             //Highlight the unmatched rows.
-            if (creationGridView.Rows.Count != 0)
-                for (int j = 0; j < creationGridView.Rows.Count; j++)
-                    if ((String.IsNullOrEmpty(creationGridView.Rows[j].Cells[0].Value as String))
-                    || (String.IsNullOrEmpty(creationGridView.Rows[j].Cells[3].Value as String)))
-                    {
-                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.Red;
-                    }
-                    else
-                    {
-                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.White;
-                    }
+            highlight_unmatched();
+            clearEmptyRows();
 
         }// End of import EPC button click
         
         private void importDataBtn_Click(object sender, EventArgs e)
-        {
-            
+        {       
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "CSV|*.csv";
             ofd.Title = "Import Data file";
@@ -285,6 +443,7 @@ namespace EPC2RUGID
             {
                 try
                 {
+                    dataClear();
                     List<String> rawrow = new List<String>();
                     using (var reader = new StreamReader(ofd.FileName))
                     {
@@ -294,7 +453,7 @@ namespace EPC2RUGID
                         }
                     }
 
-                    int difference;
+                    int difference; bool rugidcolcheck = false; 
 
                     string[] rows = rawrow.ToArray();
                     string[] numcol = rows[0].Split(','); //Just to know how many columns in the file
@@ -311,6 +470,22 @@ namespace EPC2RUGID
                             shuffle[j] += data[j] + ",";
                     }
                     
+                    //Checking to see if user is loading the proper file (At least have a Rug ID column
+                    for(int i = 0; i < numcol.Length; i++)
+                    {
+                        string[] headercheck = shuffle[i].Split(',');
+                        if (headercheck[0] == "Rug ID")
+                            rugidcolcheck = true;
+                        if (headercheck[0] == "System Qty")
+                            qtycolcheck = true;
+
+                    }
+                    if (!rugidcolcheck)
+                    {
+                        MessageBox.Show("Did you import a file missing a Rug ID column?\nPerhaps the wrong or even empty file?", "Incompatible file");
+                        return;
+                    }
+
                     // The data is organized and matched together to match with the proper column
                     // and fill out the data
                     // locid=1 loctype=2 RugId=3 size=4 upc=5 stockno=6 type=7 sysq=8
@@ -369,71 +544,14 @@ namespace EPC2RUGID
                         " this could be another Exception","Already Opened");
                     Console.WriteLine(ex);
                 }
-                //The variable table has an extra empty row at the end, just remove it
-                creationGridView.Rows.RemoveAt(creationGridView.Rows.Count-1);
-
                 
             }// End of loading file
 
-//testing area
-            //Handling quantites > 1. windows forms is an embarassment and I need to recreate duplicating rows
-            List<int> rowindexcount = new List<int>();
-            List<int> rowindex = new List<int>();
-            //first we need to know what rows need to be duplicated and how many times sysq = 8
-            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
-            {
-                if (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1)
-                {
-                    rowindex.Add(rowi); // we have what index
-                    rowindexcount.Add(Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()));
-                    // we have how many times
-                }
-            }
-            //Now that we know which row and how many times, create the empty rows
-            for (int rowi = rowindex.Count-1; rowi >= 0; rowi--)
-            {
-                Debug.WriteLine("rowindex: " + rowindex[rowi] + "  rowindexcount: " + rowindexcount[rowi]);
-                creationGridView.Rows.Insert(rowindex[rowi]+1, rowindexcount[rowi]-1);
-            }
-            //Now we need to load the row from before into the new rows below
-            for (int rowi = 0; rowi < creationGridView.Rows.Count; rowi++)
-            {
-                if (!String.IsNullOrEmpty(creationGridView.Rows[rowi].Cells[8].Value as String) 
-                    && (Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()) > 1))
-                {
-                    for(int i = 1; i < Int32.Parse(creationGridView.Rows[rowi].Cells[8].Value.ToString()); i++)
-                    {
-                        creationGridView.Rows[rowi + i].Cells[3].Value = creationGridView.Rows[rowi].Cells[3].Value;
-                    }
-                }
-            }//You crazy son of a bitch you did it. do it with all columns now clean up, then move to the to do list
-
-            //To do after
-            //load the duplicate data to the empty cells
-            //change the number in the qty column to 1 (they should all be one)
-            //reload the EPC numbers for when they're loaded first 
-
-//testing area
-
-            //Highlight the unmatched rows.
-            if (creationGridView.Rows.Count != 0)
-                for (int j = 0; j < creationGridView.Rows.Count; j++)
-                    if ((String.IsNullOrEmpty(creationGridView.Rows[j].Cells[0].Value as String))
-                    || (String.IsNullOrEmpty(creationGridView.Rows[j].Cells[3].Value as String)))
-                    {
-                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.Red;
-                    }
-                    else
-                    {
-                        creationGridView.Rows[j].DefaultCellStyle.BackColor = Color.White;
-                    }
-
-        }// End of function 
-
-        private void clearBtn_Click(object sender, EventArgs e)
-        {
-            creationGridView.Rows.Clear();
-        }
+            row_duplication();
+            highlight_unmatched();
+            clearEmptyRows();
+            
+        }// End of function
 
         //Needs to be redone to fit new table, maybe make more maliable as well.
         private void loadTable_Click(object sender, EventArgs e)
@@ -474,22 +592,20 @@ namespace EPC2RUGID
 
             //Adding the columns 
             foreach (DataGridViewColumn column in creationGridView.Columns)
-            {
-                if (dt.Columns != null) //explore what's null here and stop it. you may get it to work this way.
+                if (dt.Columns != null) 
                     dt.Columns.Add(column.HeaderText);
-            }
+
             //Checking if any rows are red (missing necessary data)
             //if so, warn the user with a window
             foreach (DataGridViewRow row in creationGridView.Rows)
-            {
                 if (row.DefaultCellStyle.BackColor == Color.Red)
                 {
                     MessageBox.Show("\tPlease be advised\n\tThere are currently red rows in this table\n\tThis means there's " +
-                        "important missing data that WON'T be included in the saved table" +
+                        "important missing data that WON'T be \n\tincluded in the saved table" +
                         " if you decide to continue.","Missing Data");
                     break;
                 }
-            }
+
             //Adding the rows
             foreach (DataGridViewRow row in creationGridView.Rows)
             {
@@ -531,6 +647,130 @@ namespace EPC2RUGID
             ds.Reset();
 
         }// End of save table function 
+//Over here you!
+        private void exportBtn_Click(object sender, EventArgs e)
+        {
+            if (savedGridView.Rows.Count == 0)
+            {
+                MessageBox.Show("The saved table on the right side is currently empty", "Missing Loaded Table");
+                return;
+            }
 
+            try
+            {
+                //CSV = Comma separated string.
+                string csv = string.Empty;
+
+                //Adding the header rows
+                foreach(DataGridViewColumn column in savedGridView.Columns)
+                {
+                    csv += column.HeaderText + ',';
+                }
+
+                //Add new line
+                csv += "\r\n";
+
+                //Adding the Rows 
+                foreach (DataGridViewRow row in savedGridView.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                        if (cell.Value != null)
+                            csv += cell.Value.ToString().TrimEnd(',').Replace(",", ";") + ',';
+                    //Adding another new line
+                    csv += "\r\n";
+                }
+
+                //Exporting to any Desktop
+
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
+                ManagementObjectCollection collection = searcher.Get();
+                string usernamedir = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
+                string[] usernameAt1 = usernamedir.Split('\\');
+                //C:\Users\Birb\Desktop
+                string folderPath = "C:\\Users\\" + usernameAt1[1] + "\\Desktop\\CSVs\\";
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                MessageBox.Show(folderPath);
+                File.WriteAllText(folderPath + "ExportFile.csv", csv);
+                MessageBox.Show("Successfully exported!", "Success");
+
+            } catch
+            {
+                MessageBox.Show("There's something wrong with the export", "Export Error");
+            }
+
+        }// End of Export function
+
+        private void matchBtn_Click(object sender, EventArgs e)
+        {
+            List<String> matches = new List<String>();
+            List<String> nonmatches = new List<String>();
+
+            //Of course, to match two tables you need to make sure they aren't empty
+            if ((creationGridView.Rows.Count == 0) || (savedGridView.Rows.Count == 0))
+            {
+                MessageBox.Show("It seems that one of the tables are empty\nYou need two tables in order to match them", "Missing Table");
+                return;
+            }
+
+            //Clear the data side information and the empty rows it leaves behind
+            dataClear();
+            clearEmptyRows();
+
+            //test: making the saved table completely red (we'll change it when there's a match)
+            for(int i = 0; i < savedGridView.Rows.Count; i++)
+                savedGridView.Rows[i].DefaultCellStyle.BackColor = Color.Red;
+
+            //Matching the EPCS of both sides then adding the matches to a list
+            for(int i = 0; i < savedGridView.Rows.Count; i++)
+                for(int j = 0; j < creationGridView.Rows.Count; j++)
+                    if (creationGridView.Rows[j].Cells[0].Value.ToString() == savedGridView.Rows[i].Cells[0].Value.ToString())
+                    {
+                        savedGridView.Rows[i].DefaultCellStyle.BackColor = Color.White;
+                        matches.Add(creationGridView.Rows[j].Cells[0].Value.ToString());
+                    }
+                
+            //Adding all nonmatches to a list for later EPC row reconstruction
+            for(int i = 0; i < creationGridView.Rows.Count; i++)
+                if (!matches.Contains(creationGridView.Rows[i].Cells[0].Value.ToString()))
+                    nonmatches.Add(creationGridView.Rows[i].Cells[0].Value.ToString());
+
+            matches.AddRange(nonmatches); //Appending the nonmatches list to the end of the matches list
+            epcClear(); // clearing the EPC's but not the rows
+
+            //Now the EPC's should come out organized with matches on the top and nonmatching on the bottom 
+            for(int i = 0; i < creationGridView.Rows.Count; i++)
+                creationGridView.Rows[i].Cells[0].Value = matches[i].ToString();
+
+            int adjust = 0;
+            //Now you just need to add the matching data 
+            for(int i = 0; i < savedGridView.Rows.Count; i++)
+                if (savedGridView.Rows[i].DefaultCellStyle.BackColor == Color.White)
+                {
+                    for(int j = 1; j <= 8; j++)
+                        creationGridView.Rows[i-adjust].Cells[j].Value = savedGridView.Rows[i].Cells[j].Value.ToString();
+                }
+                else
+                {
+                    adjust++;
+                }
+
+            highlight_unmatched();
+        }// End of matchBtn_Click
+
+        private void clearBtn_Click(object sender, EventArgs e)
+        {
+            creationGridView.Rows.Clear();
+            clearSavedTableHighlights();
+        }
+
+        private void clearsavedtableBtn_Click(object sender, EventArgs e)
+        {
+            savedGridView.Rows.Clear();
+        }
+
+        
     }// End of Class
 }// End of namespace

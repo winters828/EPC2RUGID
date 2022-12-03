@@ -29,12 +29,11 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.Move = new System.Windows.Forms.Button();
             this.SourceBtn = new System.Windows.Forms.Button();
             this.SourceBox = new System.Windows.Forms.TextBox();
             this.savedGridView = new System.Windows.Forms.DataGridView();
             this.savetable = new System.Windows.Forms.Button();
-            this.loadTables = new System.Windows.Forms.Button();
+            this.loadTablesBtn = new System.Windows.Forms.Button();
             this.creationGridView = new System.Windows.Forms.DataGridView();
             this.SEPC = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.LocationID = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -60,26 +59,17 @@
             this.SStockNo = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SSystemQty = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.clearsavedtableBtn = new System.Windows.Forms.Button();
+            this.exportBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.savedGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.creationGridView)).BeginInit();
             this.TheWindowsFixer.SuspendLayout();
             this.SuspendLayout();
             // 
-            // Move
-            // 
-            this.Move.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Move.Location = new System.Drawing.Point(39, 755);
-            this.Move.Name = "Move";
-            this.Move.Size = new System.Drawing.Size(100, 40);
-            this.Move.TabIndex = 13;
-            this.Move.Text = "Move";
-            this.Move.UseVisualStyleBackColor = true;
-            this.Move.Click += new System.EventHandler(this.Move_Click);
-            // 
             // SourceBtn
             // 
             this.SourceBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SourceBtn.Location = new System.Drawing.Point(1338, 806);
+            this.SourceBtn.Location = new System.Drawing.Point(39, 693);
             this.SourceBtn.Name = "SourceBtn";
             this.SourceBtn.Size = new System.Drawing.Size(97, 33);
             this.SourceBtn.TabIndex = 14;
@@ -88,7 +78,7 @@
             // 
             // SourceBox
             // 
-            this.SourceBox.Location = new System.Drawing.Point(1142, 812);
+            this.SourceBox.Location = new System.Drawing.Point(35, 643);
             this.SourceBox.Name = "SourceBox";
             this.SourceBox.Size = new System.Drawing.Size(190, 22);
             this.SourceBox.TabIndex = 15;
@@ -118,7 +108,7 @@
             // 
             // savetable
             // 
-            this.savetable.Location = new System.Drawing.Point(473, 806);
+            this.savetable.Location = new System.Drawing.Point(362, 800);
             this.savetable.Name = "savetable";
             this.savetable.Size = new System.Drawing.Size(101, 33);
             this.savetable.TabIndex = 22;
@@ -126,15 +116,15 @@
             this.savetable.UseVisualStyleBackColor = true;
             this.savetable.Click += new System.EventHandler(this.savetable_Click);
             // 
-            // loadTables
+            // loadTablesBtn
             // 
-            this.loadTables.Location = new System.Drawing.Point(780, 808);
-            this.loadTables.Name = "loadTables";
-            this.loadTables.Size = new System.Drawing.Size(75, 28);
-            this.loadTables.TabIndex = 25;
-            this.loadTables.Text = "Load";
-            this.loadTables.UseVisualStyleBackColor = true;
-            this.loadTables.Click += new System.EventHandler(this.loadTable_Click);
+            this.loadTablesBtn.Location = new System.Drawing.Point(780, 800);
+            this.loadTablesBtn.Name = "loadTablesBtn";
+            this.loadTablesBtn.Size = new System.Drawing.Size(106, 33);
+            this.loadTablesBtn.TabIndex = 25;
+            this.loadTablesBtn.Text = "Load";
+            this.loadTablesBtn.UseVisualStyleBackColor = true;
+            this.loadTablesBtn.Click += new System.EventHandler(this.loadTable_Click);
             // 
             // creationGridView
             // 
@@ -234,7 +224,8 @@
             // TheWindowsFixer
             // 
             this.TheWindowsFixer.BackColor = System.Drawing.SystemColors.MenuHighlight;
-            this.TheWindowsFixer.Controls.Add(this.Move);
+            this.TheWindowsFixer.Controls.Add(this.SourceBtn);
+            this.TheWindowsFixer.Controls.Add(this.SourceBox);
             this.TheWindowsFixer.Location = new System.Drawing.Point(1542, 12);
             this.TheWindowsFixer.Name = "TheWindowsFixer";
             this.TheWindowsFixer.Size = new System.Drawing.Size(228, 839);
@@ -242,7 +233,7 @@
             // 
             // recentBtn
             // 
-            this.recentBtn.Location = new System.Drawing.Point(12, 806);
+            this.recentBtn.Location = new System.Drawing.Point(12, 800);
             this.recentBtn.Name = "recentBtn";
             this.recentBtn.Size = new System.Drawing.Size(97, 33);
             this.recentBtn.TabIndex = 29;
@@ -252,7 +243,7 @@
             // 
             // importEPCBtn
             // 
-            this.importEPCBtn.Location = new System.Drawing.Point(115, 806);
+            this.importEPCBtn.Location = new System.Drawing.Point(115, 800);
             this.importEPCBtn.Name = "importEPCBtn";
             this.importEPCBtn.Size = new System.Drawing.Size(116, 33);
             this.importEPCBtn.TabIndex = 30;
@@ -262,7 +253,7 @@
             // 
             // importDataBtn
             // 
-            this.importDataBtn.Location = new System.Drawing.Point(237, 806);
+            this.importDataBtn.Location = new System.Drawing.Point(237, 800);
             this.importDataBtn.Name = "importDataBtn";
             this.importDataBtn.Size = new System.Drawing.Size(119, 33);
             this.importDataBtn.TabIndex = 31;
@@ -272,16 +263,17 @@
             // 
             // matchBtn
             // 
-            this.matchBtn.Location = new System.Drawing.Point(362, 806);
+            this.matchBtn.Location = new System.Drawing.Point(892, 800);
             this.matchBtn.Name = "matchBtn";
             this.matchBtn.Size = new System.Drawing.Size(105, 33);
             this.matchBtn.TabIndex = 32;
             this.matchBtn.Text = "Match";
             this.matchBtn.UseVisualStyleBackColor = true;
+            this.matchBtn.Click += new System.EventHandler(this.matchBtn_Click);
             // 
             // clearBtn
             // 
-            this.clearBtn.Location = new System.Drawing.Point(580, 806);
+            this.clearBtn.Location = new System.Drawing.Point(469, 800);
             this.clearBtn.Name = "clearBtn";
             this.clearBtn.Size = new System.Drawing.Size(106, 33);
             this.clearBtn.TabIndex = 33;
@@ -361,12 +353,34 @@
             this.SSystemQty.ReadOnly = true;
             this.SSystemQty.Width = 96;
             // 
+            // clearsavedtableBtn
+            // 
+            this.clearsavedtableBtn.Location = new System.Drawing.Point(1003, 800);
+            this.clearsavedtableBtn.Name = "clearsavedtableBtn";
+            this.clearsavedtableBtn.Size = new System.Drawing.Size(106, 33);
+            this.clearsavedtableBtn.TabIndex = 34;
+            this.clearsavedtableBtn.Text = "Clear";
+            this.clearsavedtableBtn.UseVisualStyleBackColor = true;
+            this.clearsavedtableBtn.Click += new System.EventHandler(this.clearsavedtableBtn_Click);
+            // 
+            // exportBtn
+            // 
+            this.exportBtn.Location = new System.Drawing.Point(1115, 800);
+            this.exportBtn.Name = "exportBtn";
+            this.exportBtn.Size = new System.Drawing.Size(106, 33);
+            this.exportBtn.TabIndex = 35;
+            this.exportBtn.Text = "Export";
+            this.exportBtn.UseVisualStyleBackColor = true;
+            this.exportBtn.Click += new System.EventHandler(this.exportBtn_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.ClientSize = new System.Drawing.Size(1782, 853);
+            this.Controls.Add(this.exportBtn);
+            this.Controls.Add(this.clearsavedtableBtn);
             this.Controls.Add(this.clearBtn);
             this.Controls.Add(this.matchBtn);
             this.Controls.Add(this.importDataBtn);
@@ -374,11 +388,9 @@
             this.Controls.Add(this.recentBtn);
             this.Controls.Add(this.TheWindowsFixer);
             this.Controls.Add(this.creationGridView);
-            this.Controls.Add(this.loadTables);
+            this.Controls.Add(this.loadTablesBtn);
             this.Controls.Add(this.savetable);
             this.Controls.Add(this.savedGridView);
-            this.Controls.Add(this.SourceBox);
-            this.Controls.Add(this.SourceBtn);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -387,18 +399,17 @@
             ((System.ComponentModel.ISupportInitialize)(this.savedGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.creationGridView)).EndInit();
             this.TheWindowsFixer.ResumeLayout(false);
+            this.TheWindowsFixer.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.Button Move;
         private System.Windows.Forms.Button SourceBtn;
         private System.Windows.Forms.TextBox SourceBox;
         private System.Windows.Forms.DataGridView savedGridView;
         private System.Windows.Forms.Button savetable;
-        private System.Windows.Forms.Button loadTables;
+        private System.Windows.Forms.Button loadTablesBtn;
         private System.Windows.Forms.DataGridView creationGridView;
         private System.Windows.Forms.Panel TheWindowsFixer;
         private System.Windows.Forms.Button recentBtn;
@@ -424,6 +435,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn SStockNo;
         private System.Windows.Forms.DataGridViewTextBoxColumn SType;
         private System.Windows.Forms.DataGridViewTextBoxColumn SSystemQty;
+        private System.Windows.Forms.Button clearsavedtableBtn;
+        private System.Windows.Forms.Button exportBtn;
     }
 }
 
