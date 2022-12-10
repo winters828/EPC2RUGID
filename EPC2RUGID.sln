@@ -5,6 +5,8 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPC2RUGID", "EPC2RUGID\EPC2RUGID.csproj", "{8D4512DF-2EAB-48E3-AAAC-54F4A50B2665}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "EPC2RugID Setup", "EPC2RugID Setup\EPC2RugID Setup.vdproj", "{2B5CB181-6D2E-47E4-A235-A51646990479}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,8 @@ Global
 		{8D4512DF-2EAB-48E3-AAAC-54F4A50B2665}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D4512DF-2EAB-48E3-AAAC-54F4A50B2665}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D4512DF-2EAB-48E3-AAAC-54F4A50B2665}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B5CB181-6D2E-47E4-A235-A51646990479}.Debug|Any CPU.ActiveCfg = Debug
+		{2B5CB181-6D2E-47E4-A235-A51646990479}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

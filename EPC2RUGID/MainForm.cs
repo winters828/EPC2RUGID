@@ -1,107 +1,20 @@
 ﻿/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Notes    
- *   //Section descriptions
- *      The Creation table (left side)
- *      
- *          <Recent> button
- *              If the default directory to the scanner is found, it should find the latest modified file 
- *          (most recently created) and automatically load the EPC numbers into the rows of the grid
- *          If the default directory is not found then the user is prompted to use the "Load" button 
- *          in order to select this specific file from the scanner.
- *          
- *          This PC\MC3300x\Internal shared storage\inventory
- *          
- *          
- *          <Import EPC> button 
- *              The creation table Import EPC button should simply allow the user to select the .csv file 
- *          themselves and load that information into the rows of the grid. 
- *          If the file is organized in an unfamiliar way, warn the user. 
- *          If the directory of the file isn't from the familiar device, show a message box asking 
- *          if the user wants to continue understanding there may be unexpected errors.
- *      
- *          <Import Data> button
- *              The creation table Import Data button should take in an associated file and load this
- *          information into the Creation table along side the EPC's 
- *          (you can use the example file Richard sent you)
- *          LocID, RugID, StockID and UPC
- *          
- *          <Match> button 
- *              If there is a loaded .xml file on the Static data table, this button will match 
- *          the newly scanned EPC numbers with the saved xml file's rug information based on matching
- *          EPC numbers
- *          Any EPC's that weren't matched should be highlighted on the right side to show
- *          they are missing.
- *          
- *          <Save> button 
- *              Saves the current constructed table from the creation table. This can later be loaded
- *          on the Save table.
- *          
- *          <Clear> button 
- *              Simply clears the Creation table 
- *              
- *              
- *      The Save table (right side)
- *      
- *          <Load> 
- *              Loads a previously saved .xml file to the Save table on the right. 
- *              
- *          <Clear>
- *              Simply clears the Save table
- *              
- *          <Export>
- *              Depending on what he wants to export, this could export the Creation table or
- *          the saved table (csv, xslx or both maybe?)
- *          
+ *   
+ *   
  *   //General notes and references
- *      - The terrible windows way of checking to see if a cell is empty
+ *      - The terrible windows way of checking to see if a cell is null
  *          if (String.IsNullOrEmpty(creationGridView.Rows[j].Cells[0].Value as String))
  *      - How to edit specific cells
  *          creationGridView.Rows[i].Cells[1].Value = "no longer unedited";
- *      - If you accidently created a reference through double clicking and you want to delete it, go to the object in designer
- *        click on it >> properties >> events >> find it in events list, click and delete.
  *      - In case you need the directory of the project
- *          //string workingDirectory = Environment.CurrentDirectory;
- *          //string projdir = Directory.GetParent(workingDirectory).Parent.FullName;
- *          //C:\Users\Birb\source\repos\EPC2RUGID\EPC2RUGID
+ *          string workingDirectory = Environment.CurrentDirectory;
+ *          string projdir = Directory.GetParent(workingDirectory).Parent.FullName;
  *      
- *   //To do list
- *      
- *      Priority
- *      - !!! make sure building the application is also possible!!!
- *      - create the step by step (documentation)
- *      - Finish low priority work 
- *      
- *      
- *      Low priority 
- *      <Recent button>
- *      https://stackoverflow.com/questions/3360324/check-last-modified-date-of-file-in-c-sharp
- *      - Recent button, look into how to check every file in the folder for the lastest
- *      date so then you have an option to get the latest file automatically
- *      Then you can select the associated file to combine the two
- *      - Perhaps allowing the user to change the source directory for the recent button in case it's not accurate 
- *      <File structure>
- *      - Creating a file structure automatically with EPC files, Data files, XML table files, output files 
- *      - also maybe allowing the user to set the source directory for this file structure.
- *        
- * 
- *   //Longterm considerations
- *      
- *            
- *   //Done list (to show what's been worked on)
- *      - You can now export your data into a CSV onto the desktop
- *      - Match button is finished with the ability to match the information over to the creation table and highlight which 
- *      Epc numbers are missing in the creation table, represented on the saved table 
- *      - We now replace all the data on a newly loaded file
- *      - Empty rows are now cleared out no matter what data replaces it
- *      - We now check both loaded files to make sure they meet specific requirements for each
- *      - The creation table now duplicates rows while keeping the EPC's organized (that was a nightmare)
- *      - The creation table now highlights rows red when the rug id or epc column is null 
- *      - User can now load two seperate specific files either time and load the data
- *      - User is able to move any files from one directory to another
- *      - User is now able to control how many rows in the datagrid window
- *      - User is now able to check the extension of the file to make sure it's only .xlsx
- *      - User is now able to save the data from the table onto an xml file in any folder you'd like
- *      - User can now both save and open xml files onto the datagrid
+ *      Note for the next developer who may see this. 
+ *          If you understand Winforms and the DataGridView class then you'll have no problem with this code. 
+ *      I'm still a low experienced programmer so I hope my notes help, I tried to revise them a little bit. 
+ *      All the best.
  * 
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
@@ -117,18 +30,10 @@ using System.Management;
 using System.Diagnostics;
 using System.Collections;
 
-//If not used by the end, delete
-//using System.Text;
-//using System.Threading.Tasks;
-//using System.ComponentModel;
-
 namespace EPC2RUGID
 {
     public partial class MainForm : Form
     {
-        /*Directories also delete by finishing the program
-        String sourcedir = @"C:\Users\Birb\Desktop\sourcetest";
-        String destinationdir = @"C:\Users\Birb\Desktop\destinationtest";*/
 
         //Dataset and corresponding Datatable 
         DataTable dt = new DataTable();
@@ -141,18 +46,24 @@ namespace EPC2RUGID
         { //Start upon creation of the form, all prior actions are done here
             InitializeComponent();
 
-            // So upon running the program you want to create the directory tree on the desktop if there isn't one already 
+
+            /* 
+            // Keep this code as it allows access to the users desktop which may prove helpful in the future.
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
             ManagementObjectCollection collection = searcher.Get();
             string usernamedir = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
             string[] usernameAt1 = usernamedir.Split('\\');
             //C:\Users\Birb\Desktop
-            string folderPath = "C:\\Users\\" + usernameAt1[1] + "\\Desktop\\CSVs\\";
+            string folderPath = "C:\\Users\\" + usernameAt1[1] + "\\Desktop\\EPC2RugID Data Files\\";
             MessageBox.Show(folderPath);
             if (!Directory.Exists(folderPath))
             {
                 Directory.CreateDirectory(folderPath);
+                Directory.CreateDirectory(folderPath + "SPARS Files\\");
+                Directory.CreateDirectory(folderPath + "Saved Table XML Files\\");
+                Directory.CreateDirectory(folderPath + "Exported Files\\");
             }
+            */
         }
 
         // Local Functions
@@ -296,75 +207,6 @@ namespace EPC2RUGID
         }
 
         // Buttons
-
-        /*likely will delete this event handler if not used. keep around for now as a note on moving files
-         * 
-        private void Move_Click(object sender, EventArgs e)
-        //Takes in a List of strings (file directories) and checks the extension of the file.
-        //Returns true if all files are .xlsx, returns false and shows message box warning the user of mixed files. 
-        //This false value will be used to NOT move the files from the source folder. 
-        private bool Extension_Check(List<String> Excelfiles)
-        {
-            // Goes through each file to check if the folder only contains .xlsx extension 
-            foreach (String file in Excelfiles)
-            {
-                FileInfo eFile = new FileInfo(file);
-
-                String ext = "";
-                for (int i = 4; i >= 1; i--)
-                {
-                    ext += eFile.Name[eFile.Name.Length - i].ToString();
-                }
-                //last letter out of four x=-4 s=-3 l=-2 x=-1
-                if (ext != "xlsx")
-                {
-                    MessageBox.Show("The source directory currently contains files other than .xlsx files\nMove aborted", "Invalid file detected");
-                    return false;
-                }
-
-            }
-            MessageBox.Show("File successfully moved", "Success!");
-            return true;
-        }
-        {// We may not even need this now, keep the button off to the side
-
-            //MessageBox.Show(text: $"Hello your button currently works");
-
-            //We'll check to see if the folder exists if not, create one.
-            DirectoryInfo dirInfo = new DirectoryInfo(destinationdir);
-            if (dirInfo.Exists == false)
-                Directory.CreateDirectory(destinationdir);
-
-            //Creating a list of String from source directory
-            List<String> Excelfiles = Directory.GetFiles(sourcedir, "*.*", SearchOption.AllDirectories).ToList();
-
-            // Goes through an extension check of each file and upon returning true, carries out the movement of files.
-            if(Extension_Check(Excelfiles))
-            {
-                foreach(String file in Excelfiles)
-                {
-                    FileInfo eFile = new FileInfo(file);
-                    if (new FileInfo(dirInfo + "\\" + eFile.Name).Exists == false)
-                    {
-                        eFile.MoveTo(dirInfo + "\\" + eFile.Name);
-                    }
-                }
-            }
-
-        }// End of move_click*/
-
-        private void recentBtn_Click(object sender, EventArgs e)
-        {
-            //string[] files = Directory.GetFiles(@"This PC\MC3300x\Internal shared storage\inventory");
-            string[] files = Directory.GetLogicalDrives();
-            string all = "";
-            foreach (string file in files)
-            {
-                all += "\n" + file;
-            }
-            MessageBox.Show(all);
-        }
-
         private void importEPCBtn_Click(object sender, EventArgs e)
         {
 
@@ -592,7 +434,7 @@ namespace EPC2RUGID
                     Console.WriteLine(ex);
                 }
             }
-        }
+        }// End of load function 
 
         private void savetable_Click(object sender, EventArgs e)
         {
@@ -663,50 +505,33 @@ namespace EPC2RUGID
                 return;
             }
 
-            try
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "CSV|*.csv";
+            string header = "EPC,Location ID:,Location Type:,Rug ID,Size,UPC,Stock No,Type,System Qty";
+            StreamWriter writer = null;
+            if (sfd.ShowDialog() == DialogResult.OK)
             {
-                //CSV = Comma separated string.
-                string csv = string.Empty;
-
-                //Adding the header rows
-                foreach (DataGridViewColumn column in savedGridView.Columns)
+                try
                 {
-                    csv += column.HeaderText + ',';
+                    writer = new StreamWriter(sfd.FileName);
+
+                    writer.WriteLine(header);
+                    for (int i = 0; i < savedGridView.Rows.Count; i++)
+                    {
+                        writer.WriteLine(savedGridView.Rows[i].Cells[0].Value.ToString() + "," + savedGridView.Rows[i].Cells[1].Value.ToString()
+                             + "," + savedGridView.Rows[i].Cells[2].Value.ToString() + "," + savedGridView.Rows[i].Cells[3].Value.ToString()
+                              + "," + savedGridView.Rows[i].Cells[4].Value.ToString() + "," + savedGridView.Rows[i].Cells[5].Value.ToString()
+                               + "," + savedGridView.Rows[i].Cells[6].Value.ToString() + "," + savedGridView.Rows[i].Cells[7].Value.ToString()
+                                + "," + savedGridView.Rows[i].Cells[8].Value.ToString());
+                    }
+                    writer.Close();
+                    MessageBox.Show("Successfully exported!", "Success");
+
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(ex.ToString());
                 }
 
-                //Add new line
-                csv += "\r\n";
-
-                //Adding the Rows 
-                foreach (DataGridViewRow row in savedGridView.Rows)
-                {
-                    foreach (DataGridViewCell cell in row.Cells)
-                        if (cell.Value != null)
-                            csv += cell.Value.ToString().TrimEnd(',').Replace(",", ";") + ',';
-                    //Adding another new line
-                    csv += "\r\n";
-                }
-
-                //Exporting to any Desktop
-
-                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
-                ManagementObjectCollection collection = searcher.Get();
-                string usernamedir = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
-                string[] usernameAt1 = usernamedir.Split('\\');
-                //C:\Users\Birb\Desktop
-                string folderPath = "C:\\Users\\" + usernameAt1[1] + "\\Desktop\\CSVs\\";
-                if (!Directory.Exists(folderPath))
-                {
-                    Directory.CreateDirectory(folderPath);
-                }
-                MessageBox.Show(folderPath);
-                File.WriteAllText(folderPath + "ExportFile.csv", csv);
-                MessageBox.Show("Successfully exported!", "Success");
-
-            }
-            catch
-            {
-                MessageBox.Show("There's something wrong with the export", "Export Error");
             }
 
         }// End of Export function
